@@ -1,0 +1,89 @@
+:root
+	--B: #060606
+	--C1: #ccc
+	--C2: #aaa
+*, *:after, *:before
+	margin: 0
+	padding: 0
+	-webkit-box-sizing: border-box
+	-moz-box-sizing: border-box
+	box-sizing: border-box
+
+@font-face
+	font-family: 'Ga'
+	//src: url("/res/font/GrenzeGotisch-VariableFont_wght.ttf")
+	src: url("/res/font/iosevka-slab-thin.ttf")
+	font-weight: 10
+	font-variation-settings: "wght" 50, "YTSE" 40, "wdth" 600
+
+body
+	display: flex
+	flex-direction: column
+	min-height: 100vh
+	font-family: Ga
+	background-color: var( --B )
+	color: #aaa
+	word-break: break-word
+	hyphens: auto
+	font-size: 22px
+
+body > div
+	margin: auto
+
+ol
+	transform: scale( .8 ,1)
+	column-count: 1
+	column-fill: auto
+	column-gap: 1em
+@media all and (max-width: 700px)
+	ol
+		column-count: 1
+ol li
+	margin-left: 2em
+
+h1 ,h2
+	font-weight: 100
+
+a
+	font-size: 100%
+	color: #aaa
+	text-decoration: none
+	border: none
+	outline: none
+	border: 1px solid rgba( 0,0,0,0 )
+a:focus
+	box-shadow: inset 0 0 10px
+
+button
+	background-color: var(--B)
+	color: #444
+	font-size: 120%
+	border: none
+#BACK
+	position: fixed
+	top: 0
+	right: 0
+	font-size: 500%
+	width: 100px
+#BACK:focus
+	border: none
+	box-shadow: none
+
+pre
+	opacity: 0
+	transition: opacity 1s 0s
+	transform: scale( .6 ,1)
+	font-weight: normal
+	font-size: 22px
+	color: #9a9a9a
+.ok
+	font-size: 200%
+	color: #33f
+	font-weight: bold
+.er
+	color: #b44
+	font-weight: bold
+.warning
+	color: #fa6
+	font-weight: bold
+

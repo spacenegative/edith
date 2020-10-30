@@ -1,0 +1,42 @@
+:root  {
+	 --B: #060606  ;
+	 --C1: #ccc  ;
+	 --C2: #aaa }
+@font-face  {
+	 font-family: 'Ga'  ;
+	 src: url("/res/font/GrenzeGotisch-VariableFont_wght.ttf")  ;
+	 font-weight: 10  ;
+	 font-variation-settings: "wght" 50, "YTSE" 40, "wdth" 600 }
+*, *:after, *:before  {
+	 margin: 0  ;
+	 padding: 0  ;
+	 -webkit-box-sizing: border-box  ;
+	 -moz-box-sizing: border-box  ;
+	 box-sizing: border-box }
+body  {
+	 padding: 1em  ;
+	 display: flex  ;
+	 min-height: 100vh  ;
+	 font-family: Ga  ;
+	 background-color: var( --B )  ;
+	 color: #aaa  ;
+	 word-break: break-word  ;
+	 hyphens: auto  ;
+	 font-size: 22px }
+.g  {
+	 display: grid  ;
+	 grid-gap: 10px  ;
+	 grid-template-columns: 1fr 1fr }
+a  {
+	 font-size: 100%  ;
+	 color: #aaa  ;
+	 text-decoration: none  ;
+	 border: none  ;
+	 outline: none  ;
+	 padding: 5px  ;
+	 border: 1px solid rgba( 0,0,0,0 ) }
+a:focus  {
+	 box-shadow: inset 0 0 10px }
+h1 ,h2 ,h3  {
+	 margin-top: 1em  ;
+	 font-weight: 100 }

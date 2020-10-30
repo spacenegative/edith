@@ -1,0 +1,17 @@
+<!DOCTYPE html>                                                                                                           
+html`                                                                                                                     
+  title`                                                                                                                  
+    @                                                                                                                     
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>                                                    
+  <meta name='viewport' content='user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1'/>                
+  <meta name='theme-color' content='#111111' />                                                                           
+  <link rel='stylesheet' href='index.css?91273cc4099ac13654a758f3e7d26e9da71cc2a8342fbbcf4e1277416c59e036=112233445566'/> 
+  body`                                                                                                                   
+
+    div tabindex="0" class="page"`                                                                                                                                                                                                               
+      <ul><li class="cursor">Lorem ipsum dolor sit amet,</li><li>consectetuer adipiscing elit,</li><li>sed diam nonummy nibh euismod volutpat.</li><li>Ut wisi enim ad minim veniam,</li><li>quis nostrud exerci uscipit lobortis nisl</li></ul> 
+
+    <div id="INc"><textarea oninput="autosize(this)" id="IN"></textarea></div> 
+
+    <script src='index.js?91273cc4099ac13654a758f3e7d26e9da71cc2a8342fbbcf4e1277416c59e036=112233445566'></script> 
+

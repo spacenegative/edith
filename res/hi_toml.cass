@@ -1,0 +1,10 @@
+.page ul
+	 color: var(--fc)
+
+.comment_symbol
+	 color: var(--B)
+.str
+	 color: #999
+.paren
+	 color: rgb(200,50,50)
+

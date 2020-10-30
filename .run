@@ -1,0 +1,3 @@
+#!/bin/bash
+/var/www/edith/main/target/release/edith 6000
+

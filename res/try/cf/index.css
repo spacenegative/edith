@@ -1,0 +1,48 @@
+:root  {
+         --B: #090909  ;
+         --C1: #ccc  ;
+         --C2: #aaa }
+*, *:after, *:before  {
+         margin: 0  ;
+         padding: 0  ;
+         -webkit-box-sizing: border-box  ;
+         -moz-box-sizing: border-box  ;
+         box-sizing: border-box }
+body  {
+         font-size: 130%  ;
+         background-color: var( --B )  ;
+         color: rgb( 150,150,150 ) }
+.page  {
+         width: 100%  ;
+         min-height: 100vh  ;
+         display: flex }
+.page ul  {
+         font-family: times new roman  ;
+         margin: auto }
+.page ul li  {
+         list-style-type: none  ;
+         white-space: pre  ;
+         tab-size:18  ;
+         margin-bottom: 0.5em }
+.page ul .cursor  {
+         list-style-type: disc }
+#INc  {
+         position: fixed  ;
+         backface-visibility: hidden  ;
+         left: 0  ;
+         //top: 0  ;
+         bottom: 0  ;
+         right: 0 }
+#INc textarea  {
+         tab-size:18  ;
+         background-color: rgba( 0,0,0,0 )  ;
+         font-family: times new roman  ;
+         color: #999  ;
+         outline: none  ;
+         border: none  ;
+         width: 100%  ;
+         font-size: 120%  ;
+         margin: 6%  ;
+         padding: 1% }
+#INc textarea:focus  {
+         border-left: 1px solid #444 }

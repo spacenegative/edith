@@ -1,0 +1,651 @@
+/* import Vnumeric escapeStr */
+	/*  */
+{{ call .Import ".escape.js" }}
+{{ call .Import ".mark.js" }}
+{{ call .Import "_paged.js" }}
+{{ call .Import "_hi.js" }}
+{{ call .Import "_complete.js" }}
+var      FILE = file()
+const    M = new Mark(PAGED)
+var      DOUBLE_END = 0
+var      REPLACE = true
+var      COMPLETIONS = completions()
+//To add a new extention (EXT):
+//(1) add case @comment_prefix()
+//(2) add case @function completions() @_complete.jass
+//(3) add var COMPLETE_EXT @_complete.jass
+//(4) add function EXT() @_hi.jass
+//(5) create new cass file hi_EXT.cass
+//(6) add script: edith_EXT -even if it does nothing-
+
+async function ajx( x, url )
+	if ( ( typeof x ) != 'string' )
+		alert( "FIRST ARG TO 'ajx' MUST BE STRING" )
+		return
+	var p = new Promise(function(ok ,er)
+		var r = new XMLHttpRequest()
+		r .open("POST" ,url ,true)
+		r .setRequestHeader("Content-Type", "application/json")
+		r .send(x)
+		r .onreadystatechange = function (  )
+			if ( r.readyState == 4 )
+				if ( r.status == 200 )
+					ok(r.responseText)
+				else
+					er( r.status )
+	)
+	return p
+
+function prefixTabs( x )
+	let tabs = ""
+	function collect( y )
+		if ( y.slice(0 ,1) == "\t" )
+			tabs += "\t"
+			collect(y.slice(1))
+	collect(x)
+	return tabs
+
+function apply( f ) /* (li)-> */
+	let p = page()
+	let sel = Array.from(p.getElementsByClassName( "sel" ))
+	if ( sel.length > 0 )
+		sel.map(f)
+	else
+		f(cursor(p))
+//if there are selected lines in cur page apply f to them  else apply f to cursor li
+
+function insertAfter( node ,newNode )
+	node.parentNode.insertBefore(newNode ,node.nextSibling)
+
+function insertBefore( node ,newNode )
+	node.parentNode.insertBefore(newNode ,node)
+
+function cursor( p )
+	let c = p.querySelector(".cursor")
+	if ( c == null )
+		let li = document.createElement("li")
+		li.setAttribute("class" ,"cursor")
+		let ul = p.querySelector("ul")
+		ul.appendChild(li)
+		p.appendChild(ul)
+		return li
+	return c
+
+function page( )
+	let n = parseFloat(document.location.hash.slice( 1 )) +2
+	return document .querySelector( ".page:nth-child(" +n +")" )
+
+function autosize( e )
+	let lines = e.value.split( "\n" )
+	let n = lines.length
+	e.setAttribute( "rows" ,n)
+//autosize height of textarea
+
+function find_next(direction)
+	let p = page()
+	let ps = PAGED .getElementsByClassName( "page" )
+	let n = ps.length
+	let cur = parseFloat( document.location.hash.slice( 1 ) )
+	if ( direction == 1 )
+		for ( var i=cur+1 ; i<n ; i++ )
+			let mark = ps[i].querySelector("mark")
+			if ( mark != null )
+				showPage( cur ,i ,PAGED ,true )
+				break
+	else
+		for ( var i=cur-1 ; i>-1 ; i-- )
+			let mark = ps[i].querySelector("mark")
+			if ( mark != null )
+				showPage( cur ,i ,PAGED ,true )
+				break
+	return
+
+function replace_selected( v )
+	let p = page()
+	let mark = p.querySelector("mark")
+	let marks = Array .from(p.getElementsByTagName( "mark" ))   .filter((m)=> m != null)  .map((m)=> m.replaceWith(v))
+
+function ext(  )
+	let e = ""
+	let xs = window.location.href.split(".")
+	if ( xs.length > 1 )
+		e = xs[1].split("/")[0]
+	return e
+
+function comment_prefix( html )
+	let prefix = ""
+	if ( ext() == "cass" || ext() == "jass" || ext() == "rass" )
+		prefix = "//"
+		if ( html )
+			return "<span class='comment_symbol'>" +prefix +"</span>"
+		---> prefix
+	if ( ext() == "toml" )
+		prefix = "#"
+		if ( html )
+			return "<span class='comment_symbol'>" +prefix +"</span>"
+		---> prefix
+	prefix = "#"
+	if ( html )
+		return "<span class='comment_symbol'>" +prefix +"</span>"
+	---> prefix
+//if html==true reture html else return text
+
+function comment( li )
+	let line = li.innerHTML
+	let t = line.trim()
+	li.innerHTML = "<span class='comment'>" +line.replace(t ,comment_prefix(true) +t) +"</span>"
+
+function uncomment( li )
+	li.querySelector(".comment_symbol").remove()
+	li.innerHTML = li.querySelector(".comment").innerHTML
+
+function linize( l )
+	let ts = prefixTabs(l)
+	l = l.trim()
+	l = l .replaceAll("\n" ," ")
+	l = l .replaceAll("\t" ," ")
+	return ts +l
+//before saving
+
+function untab( x )
+	x = x .replaceAll("\t"   ,"nstoeadrlyiuuuut456iunstaeozxc" +"456uzxcaeo456uzxcaeo456uzxc")
+	x = x .replaceAll("\n"   ,"nstoeadyiunstaeodrlyiu1233u21i" +"y123oeaueo456uzxcaeo456uzxc")
+	return   x
+function retab( x )
+	x = x .replaceAll(  "nstoeadrlyiuuuut456iunstaeozxc" +"456uzxcaeo456uzxcaeo456uzxc" ,"\t")
+	x = x .replaceAll(  "nstoeadyiunstaeodrlyiu1233u21i" +"y123oeaueo456uzxcaeo456uzxc" ,"\n")
+	return   x
+
+function file(  )
+	let hs = window.location.href.split("/")
+	hs.shift()
+	hs.shift()
+	hs.shift()
+	hs.pop()
+	return hs.join("/")
+
+//TEXT manipulation
+
+function move( direction ) /* 1|-1 */
+	let c = cursor(page())
+	let next = c.nextSibling
+	if ( direction == -1 )
+		next = c.previousSibling
+	if ( next == null || next.tagName == undefined )
+		return false
+	c.classList.remove("cursor")
+	next.classList.add("cursor")
+	return true
+
+function newLineAfter(  )
+	let c = cursor(page())
+	c.classList.remove("cursor")
+	let li = document.createElement("li")
+	li.setAttribute("class" ,"cursor")
+	insertAfter(c ,li)
+	IN.focus()
+	IN.value = prefixTabs(c.innerText)
+
+function newLineBefore(  )
+	let c = cursor(page())
+	c.classList.remove("cursor")
+	let li = document.createElement("li")
+	li.setAttribute("class" ,"cursor")
+	insertBefore(c ,li)
+	IN.focus()
+
+function insertTab( li )
+	function ins( l )
+		return "\t" +l
+	let l = li.innerText
+	let ls = l.split("\n")
+	li.innerHTML = hi(escapeHtml(ls .map(ins) .join("\n")))
+function removeTab( li )
+	function rem( l )
+		if ( l.slice(0,1) == "\t" )
+			return l.slice(1)
+		return l
+	let l = li.innerText
+	let ls = l.split("\n")
+	li.innerHTML = hi(escapeHtml(ls .map(rem) .join("\n")))
+
+function delLine( li )
+	if ( li.classList.contains("cursor") )
+		if ( !move(1) )
+			move(-1)
+	li.remove()
+
+function copyLines( before )
+	let sel = PAGED.getElementsByClassName( "sel" )
+	let p = page()
+	let n = sel.length
+	if ( n > 0 )
+		let c = cursor(p)
+		if ( before )
+			for ( var i=0 ; i<n ; i++ )
+				let clone = sel[i].cloneNode(true)
+				clone.classList.remove("sel")
+				clone.classList.remove("cursor")
+				insertBefore(c ,clone)
+		else
+			for ( var i=n-1 ; i>-1 ; i-- )
+				let clone = sel[i].cloneNode(true)
+				clone.classList.remove("sel")
+				clone.classList.remove("cursor")
+				insertAfter(c ,clone)
+			return
+
+function insert_lines( s ,e ,before)
+	let p = page()
+	let ls = Array.from(p. getElementsByTagName("li"))
+	ls = ls.slice(s-1 ,e)
+	let n = ls.length
+	let c = cursor(p)
+	if ( before )
+		for ( var i=0 ; i<n ; i++ )
+			let clone = ls[i].cloneNode(true)
+			clone.classList.remove("cursor")
+			insertBefore(c ,clone)
+	else
+		for      ( var i=n-1 ; i>-1 ; i-- )
+			let clone = ls[i].cloneNode(true)
+			clone.classList.remove("cursor")
+			insertAfter(c ,clone)
+
+function delete_line_range(s ,e)
+	s = s -1
+	let p = page()
+	let ps = Array.from(p .getElementsByTagName("li"))
+	for (var i=s ;i<e ;i++)
+		ps[i].remove()
+//delete lines without moving cursor
+
+function commentLines(f)
+	let p = page()
+	let ss = Array .from(p.getElementsByClassName( "sel" ))
+	if ( ss.length > 0 )
+		ss .map(f)
+	else
+		f(cursor(p))
+
+function selectLine(  )
+	let c = cursor(page())
+	if ( c.classList.contains("sel") )
+		c.classList.remove("sel")
+	else
+		c.classList.add("sel")
+
+function unselect_all()
+	Array.from(PAGED. getElementsByClassName("sel")) .map((s)=> s.classList.remove("sel"))
+	save_all()
+
+function into_lis(  )
+	let c = cursor(page())
+	let cs = c .innerText.split("\n")
+	c.innerHTML = hi(escapeHtml(cs[0]))
+	var  n = cs.length
+	for ( var i=1 ; i<n ; i++ )
+		let li = document.createElement("li")
+		li.innerHTML = hi(escapeHtml(cs[i]))
+		insertAfter(c ,li)
+		c = li
+//split current -multiline- li into multiple li elements
+
+function resetCom(  )
+	COM.value = ""
+	IN.focus()
+	COM.focus()
+//The change of focus to IN and then back to COM is to hide the COM autocompletion
+
+//PAGES
+
+async function del_page(  )
+	let curPage = parseFloat( document.location.hash.slice( 1 )) +1000
+	let lastPage = Array .from(document.getElementsByClassName( "page" )).length +999
+	let o =
+		CurPage: curPage,
+		LastPage: lastPage,
+	await ajx( JSON.stringify(o) ,"del/" )
+	if (curPage == lastPage)
+		document.location.hash = "#" +(curPage -1000 -1)
+	location .reload()
+//Delete current page
+
+async function ins_page_after(  )
+	let n = parseFloat( document.location.hash.slice( 1 ))
+	let o =
+		CurPage: n +1001,
+		LastPage: Array .from(document.getElementsByClassName( "page" )).length +1000,
+	await ajx( JSON.stringify(o) ,"ins/" )
+	document.location.hash = "#" +(n+1)
+	location .reload()
+
+async function ins_page_before(  )
+	let n = parseFloat( document.location.hash.slice( 1 ))
+	let o =
+		CurPage: n +1000,
+		LastPage: Array .from(document.getElementsByClassName( "page" )).length +1000,
+	await ajx( JSON.stringify(o) ,"ins/" )
+	location .reload()
+
+//KEYS
+
+function inKeys(  )
+	function keydown( ev )
+		//console.log( ev.keyCode )
+		if (ev.keyCode == 27) /* esc */
+			ev.preventDefault()
+			document.execCommand('insertText', true, '\n')
+			return
+		if (ev.keyCode == 9) /* tab */
+			ev.preventDefault()
+			if (!complete())
+				document.execCommand('insertText', true, '\t')
+			return
+		if (ev.keyCode == 13) /* return */
+			ev.preventDefault()
+			let a = cursor(page())
+			a.innerHTML = hi(escapeHtml(IN.value))
+			IN.value = ""
+			COM.focus()
+			INc.style.zIndex = -1
+			AC.innerHTML = ""
+			save()
+		if (ev.keyCode == 35) /* double end */
+			DOUBLE_END += 1
+			if ( DOUBLE_END == 2 )
+				DOUBLE_END = 0
+				ev.preventDefault()
+				let a = cursor(page())
+				a.innerHTML = hi(escapeHtml(IN.value))
+				IN.value = ""
+				COM.focus()
+				INc.style.zIndex = -1
+				AC.innerHTML = ""
+				save()
+				return
+		else
+			if ( DOUBLE_END == 1 )
+				DOUBLE_END = 0
+		//if (ev.keyCode == 32) /* space */
+			//complete()
+			//return
+		return
+	IN .addEventListener('keydown' ,keydown)
+	IN .addEventListener('input' ,suggest)
+
+function comKeys(  )
+	function keydown( ev )
+		//console.log(ev.keyCode)
+		if (ev.keyCode == 8) /* backspace */
+			if (   COM.value .startsWith("/")    || COM.value .startsWith(">")    || COM.value .startsWith("<")    || COM.value .startsWith("h:")    )
+				--->
+			ev.preventDefault()
+			resetCom()
+			--->
+		if ( ev.shiftKey )
+			if ( ev.keyCode == 38 || ev.keyCode == 40 )
+				/* down|up */
+				selectLine()
+		if (ev.keyCode == 37) /* left */
+			if (COM.value .startsWith("h:"))
+				--->
+			apply(removeTab)
+			save()
+			--->
+		if (ev.keyCode == 39) /* right */
+			if (COM.value .startsWith("h:"))
+				--->
+			apply(insertTab)
+			save()
+			--->
+		if (ev.keyCode == 32) /* space */
+			if (COM.value .startsWith("h:"))
+				--->
+			ev.preventDefault()
+			if (ev.getModifierState("CapsLock"))
+				newLineBefore()
+			else
+				newLineAfter()
+			INc.style.zIndex = 1
+			--->
+		if (ev.keyCode == 9) /* tab --edit line */
+			ev.preventDefault()
+			INc.style.zIndex = 1
+			IN.value = cursor(page()).innerText
+			IN.focus()
+			autosize(IN)
+			--->
+		if (ev.keyCode == 40) /* . down */
+			if (COM.value .startsWith("h:"))
+				--->
+			ev.preventDefault()
+			move(1)
+			save()
+			--->
+		if (ev.keyCode == 38) /* , (up) */
+			if (COM.value .startsWith("h:"))
+				--->
+			ev.preventDefault()
+			move(-1)
+			save()
+			--->
+		--->
+	COM.addEventListener('keydown' ,keydown)
+	--->
+
+async function execute( ev )
+	ev.preventDefault()
+	let v = COM.value
+	//...execute
+
+	//...execute LINE EDITING
+	if ( v == "d" ) /* delete lines in current page */
+		apply(delLine)
+		resetCom()
+		save()
+		--->
+	if ( v == "p" ) /* paste selected lines in current page before cursor */
+		copyLines(true)
+		save()
+		--->
+	if ( v == "P" ) /* paste selected lines in current page after cursor */
+		copyLines(false)
+		save()
+		--->
+	if ( v == "#" ) /* comment selected lines in current page */
+		commentLines(comment)
+		save()
+		--->
+	if ( v == "##" ) /* uncomment selected lines in current page */
+		commentLines(uncomment)
+		save()
+		--->
+	if ( v == "hi" ) /* hi cur page */
+		Array.from(page().getElementsByTagName( "li" ))  .map((l)=> l.innerHTML = hi(escapeHtml(l.innerText)))
+		save()
+		--->
+	if ( v == "l" ) /* */
+		into_lis()
+		resetCom()
+		save()
+		--->
+	if (v == "x")
+		unselect_all()
+		resetCom()
+		--->
+	if (v.startsWith("y"))
+		let vs = v.slice(1).split(".")
+		if (vs.length == 1)
+			let s = parseFloat(vs[0])
+			insert_lines(s ,s ,false)
+		else
+			let s = parseFloat(vs[0])
+			let e = parseFloat(vs[1])
+			insert_lines(s ,e ,false)
+		save()
+		--->
+	if (v.startsWith("d") && v != "d" && v != "dd")
+		let vs = v.slice(1).split("..")
+		let s
+		let e
+		if (vs.length == 1)
+			s = parseFloat(vs[0])
+			e = s
+		if (vs.length == 2)
+			s = parseFloat(vs[0])
+			e = parseFloat(vs[1])
+		delete_line_range(s ,e)
+		resetCom()
+		save()
+		--->
+	//...execute
+
+	//...execute TABS
+	if ( v == "w" ) /* open in new window */
+		window .open( window.location.href ,"_blank"    ,"location=yes,status=yes" )
+		resetCom()
+		--->
+	if ( v == "t" ) /* open in new tab */
+		window .open( window.location.href ,"_blank" )
+		resetCom()
+		--->
+
+	//...execute PAGE HEADER
+	if ( v.startsWith("h:") )
+		let h = v.slice(2)
+		let p = page()
+		if (h == "")
+			COM .value = "h:" +(p .querySelector("h1") .innerText)
+			--->
+		p .querySelector("h1") .innerText = v .slice(2)
+		resetCom()
+		save()
+		--->
+
+	//...execute PAGES
+	if ( Vnumeric( v ) ) /* jump to page */
+		let n = parseFloat( v ) -1
+		let cur = parseFloat( document.location.hash.slice( 1 ) )
+		showPage( cur ,n ,PAGED ,true )
+		resetCom()
+		return
+	if ( v == "dd" ) /* delete current page */
+		del_page()
+		resetCom()
+		return
+	if ( v == "ia" ) /* insert new page after cur page */
+		ins_page_after()
+		resetCom()
+		return
+	if ( v == "ib" ) /* insert new page before cur page */
+		ins_page_before()
+		COM.value = ""
+		return
+	if ( v == "sc" ) /* split current page into 2 */
+		split_page()
+		COM.value = ""
+		return
+
+	//...execute SEARCH
+	if ( v .startsWith( "/" ) ) /* search */
+		if ( v == "/" )
+			M.unmark()
+			resetCom()
+			save_all()
+			return
+		v = v .slice( 1 )
+		//M.unmark({done: function(){M.mark(v)}})
+		M.mark(v)
+		resetCom()
+		save()
+		return
+	if (v .startsWith(">")) /* find next*/
+		if ( v == ">" )
+			find_next(1)
+			return
+		v = v .slice(1)
+		if ( REPLACE )
+			replace_selected(v)
+			REPLACE = false
+			save()
+		else
+			find_next(1)
+			REPLACE = true
+		return
+	if (v .startsWith("<")) /* find previous */
+		if ( v == "<" )
+			find_next(-1)
+			return
+		v = v .slice(1)
+		if ( REPLACE )
+			replace_selected(v)
+			REPLACE = false
+			save()
+		else
+			find_next(-1)
+			REPLACE = true
+		return
+	// find is a 2 step command and depends on the REPLACE var if REPLACE, replace marked text in current page else find next EX: find 'drl' and replace with 'nst' 1. /drl  2. >nst
+
+	//...execute LINKS
+	if ( v == "i" ) /* */
+		let n = parseFloat( document.location.hash.slice( 1 ))
+		location .assign("index/#" +n)
+		return
+	if ( v == "help" )
+		location .assign("/help/")
+		return
+	if ( v == "ter" )
+		let r = await ajx("" ,"terminal/")
+		resetCom()
+		return
+	if ( v == "commit" )
+		let r = await ajx("" ,"commit/")
+		resetCom()
+		return
+	if ( v == "c" )
+		location .reload()
+		WALL.style.display = "flex"
+		let n = parseFloat( document.location.hash.slice( 1 ))
+		location .assign("compile/" +n +"/")
+		return
+
+	//...execute
+	return
+
+async function save(  )
+	let n = parseFloat( document.location.hash.slice( 1 ) ) +1000
+	let p = page()
+	let t = ""
+	let ls = Array.from(p.getElementsByTagName( "li" ))
+	function f( li )
+		t += linize(li.innerText) +"\n"
+	ls.map(f)
+	let o =
+		Html: remove_empty_lines(p.innerHTML),
+		Text: t,
+		N: n,
+	await ajx(JSON.stringify(o) ,"save/")
+async function save_all()
+	let ps = Array.from(PAGED. getElementsByClassName("page"))
+	var n = ps.length
+	for ( var i=0 ; i<n ; i++ )
+		var t = ""
+		Array.from(ps[i].getElementsByTagName( "li" ))  .map((l)=> t += linize(l.innerText) +"\n")
+		let: o =
+			Html: remove_empty_lines(ps[i].innerHTML),
+			Text: t,
+			N: i +1000,
+		await ajx(JSON.stringify(o) ,"save/")
+function remove_empty_lines(x)
+	---> x  .trim() .split("\n")  .map((l)=> l.trim())  .filter((l)=> l != "")  .join("\n")
+
+function main(  )
+	comKeys()
+	inKeys()
+	paged( PAGED ,LEFT ,RIGHT ,false ,false )
+	COM.focus()
+	return
+main()
+

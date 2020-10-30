@@ -1,0 +1,33 @@
+.paged .nav
+	 display: flex
+	 flex-direction: column
+	 justify-content: space-between
+	 position: fixed
+	 z-index: 2
+	 backface-visibility: hidden
+	 right: 0
+	 top: 0
+	 font-family: f
+	 text-align: center
+	 font-size: 18px
+	 color: #fff
+.paged .page
+	 display: none
+.paged .pager
+	 margin-right: 11px
+.hidden
+	 display: none
+.term
+	 display: none
+	 font-size: 100%
+	 position: fixed
+	 backface-visibility: hidden
+	 left: 0
+	 bottom: 0
+	 right: 0
+	 z-index: 20
+	 background-color: #111
+	 color: #666
+	 outline: none
+	 border: 1px solid #444
+

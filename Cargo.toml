@@ -1,0 +1,19 @@
+[package]
+name = "edith"
+version = "0.1.0"
+authors = ["geo <geomalamos@unseen.is>"]
+edition = "2018"
+# See more keys and their definitions at  https://doc.rust-lang.org/cargo/reference/manifest.html
+#
+[dependencies]
+macros = { path = "/home/geo/ork/rust/.geo/macros" }
+html = { path = "/home/geo/ork/rust/.geo/html/v2_0" }
+#arango = { path = "/home/geo/ork/rust/.geo/arango/v3" }
+actix-web = "*"
+actix-rt = "*"
+serde = { version = "1.0" ,features = ["derive"] }
+serde_json = "*"
+serde_derive = "*"
+tokio = "*"
+htmlescape = "*"
+

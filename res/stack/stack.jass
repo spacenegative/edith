@@ -1,0 +1,48 @@
+function textarea_keydown(  )                                                       
+         P1.onkeydown = function(ev)                                                
+                  if       (ev.keyCode==9) /* tab */                                
+                           ev.preventDefault()                                      
+                           var s = this.selectionStart                              
+                           this.value = this.value.substring(0,this.selectionStart) 
+                           + "\t" + this.value.substring(this.selectionEnd)         
+                           this.selectionEnd = s+1;                                 
+ //                        if       (ev.keyCode==13) /* ret */                      
+ //                                 ev.preventDefault()                             
+ //                                 retain_tab( this )                              
+
+function retain_tab( e )                                  
+         let x = e.value.substring(0 ,e.selectionStart)   
+         let xs = x.split( "" )                           
+         let tabs = ""                                    
+         let n = 0                                        
+         function loop()                                  
+                  if       ( xs[0] == "\t" )              
+                           tabs += "\t"                   
+                           n += 1                         
+                           xs = xs.slice( 1 )             
+                           loop(  )                       
+                  else                                    
+                           return                         
+         loop(  )                                         
+         var s = e.selectionStart                         
+         e.value = e.value.substring(0,e.selectionStart)  
+         + "\n" +tabs + e.value.substring(e.selectionEnd) 
+         e.selectionEnd = s+1+n;                          
+
+function autosize( tablen ,e )                                  
+         function len( tabs ,line ,tablen)                      
+                  if       ( line.startsWith( "\t" ) )          
+                           console.log( tabs )                  
+                           len( tabs+1 ,line.slice(1) ,tablen ) 
+                  return   tabs*tablen + line.length            
+         let lines = e.value.split( "\n" )                      
+         let n = lines.length                                   
+         e.setAttribute( "rows" ,n)                             
+         let max = 0                                            
+         for      ( var i=0 ; i<n ; i++ )                       
+                  let l = len( 0 ,lines[i] ,tablen )            
+                  if       ( l > max )                          
+                           max = l                              
+         e.setAttribute( "cols" ,max)                           
+
+

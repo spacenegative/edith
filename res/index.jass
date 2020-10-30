@@ -1,0 +1,73 @@
+/* import */
+	/*  */
+
+async function ajx( x, url )
+	if ( ( typeof x ) != 'string' )
+		alert( "FIRST ARG TO 'ajx' MUST BE STRING" )
+		return
+	var p = new Promise(function(ok ,er)
+		var r = new XMLHttpRequest()
+		r .open("POST" ,url ,true)
+		r .setRequestHeader("Content-Type", "application/json")
+		r .send(x)
+		r .onreadystatechange = function (  )
+			if ( r.readyState == 4 )
+				if ( r.status == 200 )
+					ok(r.responseText)
+				else
+					er( r.status )
+	)
+	return p
+
+async function up(e)
+	let li = e .parentElement
+	let ol = li .parentElement
+	let lis = Array.from(ol .getElementsByTagName("li"))
+	let n = lis .indexOf(li)
+	if (n>1)
+		let r = await ajx( JSON.stringify(n +1000) ,"up/")
+		if (r=="OK")
+			location.hash = "#" +(n -1) +"-up"
+			location.reload()
+async function down(e)
+	let li = e .parentElement
+	let ol = li .parentElement
+	let lis = Array.from(ol .getElementsByTagName("li"))
+	let n = lis .indexOf(li)
+	if (n < (lis.length -1))
+		let r = await ajx( JSON.stringify(n +1000) ,"down/")
+		if (r=="OK")
+			location.hash = "#" +(n +1) +"-down"
+			location.reload()
+
+function index(  )
+	let h = location.hash
+	if (h != "")
+		let hs = h .slice(1) .split("-")
+		h = parseFloat(hs[0])
+		let opt =
+			block: "center",
+		if (hs .length == 1)
+			let ls = document.getElementsByTagName( "li" )
+			let a = ls[h].querySelector("a")
+			a.focus()
+			setTimeout( function(  )
+				a.scrollIntoView(opt)
+			,20 )
+		else
+			if (hs[1] == "up")
+				let li = document .querySelector("ol li:nth-child(" +(h+1) +")")
+				setTimeout( function(  )
+					let u = li .querySelector(".up")
+					u .scrollIntoView(opt)
+					u .focus()
+				,20 )
+			if (hs[1] == "down")
+				let li = document .querySelector("ol li:nth-child(" +(h+1) +")")
+				setTimeout( function(  )
+					let d = li .querySelector(".down")
+					d .scrollIntoView(opt)
+					d .focus()
+				,20 )
+index()
+

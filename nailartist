@@ -1,0 +1,195 @@
+
+<div id='FOCUS_CON' >
+
+<button id='FOCUS' >
+</button></div>
+<div id='LEFT' >
+</div>
+<div id='RIGHT' >
+</div>
+<div class='paged' id='PAGED' >
+
+<div class='nav' >
+
+<form class='hidden' id='SEARCH' >
+
+<input class='term' >
+</input></form>
+<div class='pager' >
+</div></div>
+<div class='page' id='PAGE0' >
+
+<div >
+
+<pre id='PRE0' contenteditable='true' autocorrect='off' autocapitalize='off' spellcheck='false' >
+
+use macros::*         
+use arango::*         
+use html::*           
+//                    
+use serde::           
+       Serialize,     
+       Deserialize,   
+;                     
+use serde_json::Value 
+use actix_web::       
+       get,           
+       post,          
+       web,           
+       http,          
+       App,           
+       HttpServer,    
+       HttpResponse,  
+       Responder,     
+;                     
+//use std             
+use std::env          </pre></div></div>
+<div class='page' id='PAGE1' >
+
+<div >
+
+<pre id='PRE1' contenteditable='true' autocorrect='off' autocapitalize='off' spellcheck='false' >
+
+#[derive(Debug ,Serialize ,Deserialize )] struct Node      
+       Path:         String,                               
+       DTitle:       String,                               
+       SearchTitle:  String,                               
+       SubmitTitle:  String,                               
+       Vals:         Vec&lt;Val&gt;,                             
+       NodeType:     NodeType,                             
+       Required:     bool,                                 
+       Search:       bool,                                 
+#[derive(Debug ,Serialize ,Deserialize )] struct Val       
+       DName:        String,                               
+       SearchName:   String,                               
+       SubmitName:   String,                               
+#[derive(Debug ,Serialize ,Deserialize )] enum NodeType    
+       Single ,Bool ,Multi ,MultiTick ,                    
+#[derive(Debug ,Serialize ,Deserialize )] struct KeyedNode 
+       Key:   u32,                                         
+       Node:  Node,                                        </pre></div></div>
+<div class='page' id='PAGE2' >
+
+<div >
+
+<pre id='PRE2' contenteditable='true' autocorrect='off' autocapitalize='off' spellcheck='false' >
+
+#[actix_rt::main]                                                                                    
+async  fn     main() -&gt; std::io::Result&lt;()&gt;                                                          
+       let args:Vec&lt;String&gt; = env::args() .collect()                                                 
+       let env = &amp;args[1] .as_str()                                                                  
+       let port = &amp;args[2] .as_str()                                                                 
+       let c = connection(&quot;root&quot; ,&quot;f93dd400893eebcc2c20fc3ea5d451abe1d3161b40863f7a34017c0b&quot;) .await 
+       //let mut d = c .database(&quot;nailartist_gr&quot;) .await                                             
+       let d:DB                                                                                      
+       match  env                                                                                    
+              &amp;&quot;dev&quot; =&gt;     d = c .database(&quot;nailartist_gr--dev&quot;) .await ,                           
+              &amp;&quot;www&quot; =&gt;     d = c .database(&quot;nailartist_gr--www&quot;) .await ,                           
+              _      =&gt;     d = c .database(&quot;nailartist_gr&quot;) .await ,                                
+       return HttpServer::new( move ||                                                               
+              App::new()                                                                             
+              .data(d .clone())                                                                      
+              .service(root)                                                                         
+              .service(update)                                                                       
+              .service(pull) ;;                                                                      
+       )                                                                                             
+       .bind(&amp;(!!(&quot;127.0.0.1:{}&quot; ,port)))?                                                           
+       .run()                                                                                        
+       .await ;;                                                                                     </pre></div></div>
+<div class='page' id='PAGE3' >
+
+<div >
+
+<pre id='PRE3' contenteditable='true' autocorrect='off' autocapitalize='off' spellcheck='false' >
+
+#[post(&quot;/update/&quot;)]                                                                
+async  fn     update(d:web::Data&lt;DB&gt; ,ns:web::Json&lt;Vec&lt;String&gt;&gt;) -&gt; impl Responder 
+       let d = d .into_inner()                                                     
+       d .remove_all_from(&quot;nodes&quot;) .await                                          
+       d .inserts_into(&quot;nodes&quot; ,&amp;ns) .await                                        
+       return HttpResponse::Ok() .body(&quot;OK&quot;)                                       </pre></div></div>
+<div class='page' id='PAGE4' >
+
+<div >
+
+<pre id='PRE4' contenteditable='true' autocorrect='off' autocapitalize='off' spellcheck='false' >
+
+#[get(&quot;/&quot;)]                                                                                                                                                                                                                                
+async  fn     root() -&gt; impl Responder                                                                                                                                                                                                     
+       /* EDIT */;;                                                                                                                                                                                                                        
+       let path_header = h1(&quot;PATH&quot;) .n()                                                                                                                                                                                                   
+       let path = div(&quot;&quot;) .id(&quot;PATH&quot;) .n()                                                                                                                                                                                                 
+       let title_header = h1(&quot;ΤΙΤΛΟΣ&quot;) .n()                                                                                                                                                                                          
+       let search_title = input(&quot;&quot;) .disabled() .id(&quot;SEARCH_TITLE&quot;) .placeholder(&quot;ΤΙΤΛΟΣ ΑΝΑΖΗΤΗΣΗΣ&quot;) .n()                                                                                                                 
+       let submit_title = input(&quot;&quot;) .disabled() .id(&quot;SUBMIT_TITLE&quot;) .placeholder(&quot;ΤΙΤΛΟΣ ΚΑΤΑΧΩΡΗΣΗΣ&quot;) .n()                                                                                                               
+       let row_title = div(&amp;(search_title +&amp;submit_title)) .class(&quot;row&quot;) .n()                                                                                                                                                              
+       let node_type_header = h1(&quot;ΤΥΠΟΣ&quot;) .n()                                                                                                                                                                                        
+       let required = input(&quot;ΥΠΟΧΡΕΩΤΙΚΟ&quot;) .id(&quot;REQUIRED&quot;) .type_(Type::Checkbox) .checked() .n()                                                                                                                               
+       let required = div(&amp;required) .n()                                                                                                                                                                                                  
+       let search = input(&quot;ΝΑ ΦΑΙΝΕΤΑΙ ΣΤΗΝ ΑΝΑΖΗΤΗΣΗ&quot;) .id(&quot;SEARCH&quot;) .type_(Type::Checkbox) .checked() .n()                                                                                                        
+       let search = div(&amp;search) .n()                                                                                                                                                                                                      
+       let node_type = div(&amp;(node_type_header +&amp;create_node_type() +&amp;required +&amp;search)) .class(&quot;con&quot;) .id(&quot;TYPE_CON&quot;) .n()                                                                                                                
+       let vals_header = h1(&quot;ΤΙΜΕΣ&quot;) .n()                                                                                                                                                                                             
+       let val_add = button(&quot;+&quot;) .disabled() .onclick(&quot;add_value(this)&quot;) .id(&quot;ADD&quot;) .class(&quot;big&quot;) .n()                                                                                                                                     
+       let vals = div(&quot;&quot;) .id(&quot;VALS&quot;) .n()                                                                                                                                                                                                 
+       let path = div(&amp;(path_header +&amp;path)) .class(&quot;con&quot;) .id(&quot;PATH_CON&quot;) .n()                                                                                                                                                            
+       let title = div(&amp;(title_header +&amp;row_title)) .id(&quot;TITLE_CON&quot;) .class(&quot;con&quot;) .n()                                                                                                                                                    
+       let vals = div(&amp;(vals_header +&amp;val_add +&amp;vals)) .id(&quot;VALS_CON&quot;) .class(&quot;con&quot;) .n()                                                                                                                                                  
+       let edit = div(&amp;(path +&amp;title +&amp;node_type +&amp;vals)) .id(&quot;EDIT&quot;) .n()                                                                                                                                                                 
+       let n = div(&quot;&quot;) .class(&quot;nodes&quot;) .id(&quot;ROOT_NODES&quot;) .n()                                                                                                                                                                              
+       let add = button(&quot;+&quot;)  .onclick(&quot;new_node(\&quot;\&quot;,this)&quot;) .n()                                                                                                                                                                         
+       let m = div(&amp;(add +&amp;n)) .id(&quot;MAIN&quot;) .n()                                                                                                                                                                                            
+       let mut nav_page = button(&quot;&lt;h1&gt;ΕΝΗΜΕΡΩΣΗ SERVER&lt;/h1&gt; ME THN TOPIKH DATABASE. Η ΥΠΑΡΧΟΥΣΑ DATABASE ΣΤΟΝ SERVER ΘΑ ΔΙΑΓΡΑΦΕΙ ΚΑΙ ΘΑ ΕΝΗΜΕΡΩΘΕΙ ΜΕ ΤΗΝ ΠΑΡΟΥΣΑ DATABASE&quot;) 
+       .onclick(&quot;updateServerDb()&quot;) .n()                                                                                                                                                                                                   
+       nav_page += &amp;button(&quot;&lt;h1&gt;ΤΡΑΒΗΓΜΑ DATABASE&lt;/h1&gt; ΑΠΟ ΤΟΝ SERVER. Η ΠΑΡΟΥΣΑ ΤΟΠΙΚΗ DATABASE ΘΑ ΔΙΑΓΡΑΦΕΙ ΚΑΙ ΘΑ ΕΝΗΜΕΡΩΘΕΙ ΜΕ ΤΗΝ DATABASE ΤΟΥ SERVER&quot;)                 
+       .onclick(&quot;pullServerDb()&quot;) .n()                                                                                                                                                                                                     
+       nav_page += &amp;button(&quot;&lt;h1&gt;ΔΙΑΓΡΑΦΗ&lt;/h1&gt; ΤΟΠΙΚΗΣ DATABASE ΧΩΡΙΣ ΕΝΗΜΕΡΩΣΗ SERVER&lt;BR&gt;&quot;)                                                                                                                   
+       .onclick(&quot;deleteLocalDb()&quot;) .n()                                                                                                                                                                                                    
+       nav_page = div(&amp;nav_page) .n()                                                                                                                                                                                                      
+       nav_page = div(&amp;nav_page) .class(&quot;nav_page&quot;) .id(&quot;NAV&quot;) .n()                                                                                                                                                                        
+       let nav = button(&quot;&amp;#9776;&quot;) .onclick(&quot;nav()&quot;) .n()                                                                                                                                                                                  
+       let nav = div(&amp;nav) .class(&quot;nav&quot;) .n()                                                                                                                                                                                              
+       let body = edit +&amp;nav_page +&amp;nav +&amp;m                                                                                                                                                                                                
+       let mut h = Html                                                                                                                                                                                                                    
+              title:        &quot;Nailartist&quot;` ,                                                                                                                                                                                                
+              desc:         &quot;&quot;` ,                                                                                                                                                                                                          
+              kws:          vec![] ,                                                                                                                                                                                                       
+              theme:        &quot;#111111&quot;` ,                                                                                                                                                                                                   
+              css:          vec![&quot;/res/index.css&quot;`] ,                                                                                                                                                                                      
+              js:           vec![(JS::Script ,&quot;/res/index.js&quot;`)] ,                                                                                                                                                                         
+              favicon:      &quot;/res/img/favicon.svg&quot;` ,                                                                                                                                                                                      
+              scale:        3 ,                                                                                                                                                                                                            
+              content:      body` ,                                                                                                                                                                                                        
+       ;                                                                                                                                                                                                                                   
+       return HttpResponse::Ok() .body(h .print())                                                                                                                                                                                         </pre></div></div>
+<div class='page' id='PAGE5' >
+
+<div >
+
+<pre id='PRE5' contenteditable='true' autocorrect='off' autocapitalize='off' spellcheck='false' >
+
+#[post(&quot;/pull/&quot;)]                                     
+async  fn     pull(d:web::Data&lt;DB&gt;) -&gt; impl Responder 
+       let d = d .into_inner()                        
+       let knodes:Vec&lt;KeyedNode&gt; = d                  
+       .aql_str(&quot;FOR i IN nodes RETURN i&quot;) .await ... 
+       return HttpResponse::Ok() .body(tj!(&amp;knodes))  </pre></div></div>
+<div class='page' id='PAGE6' >
+
+<div >
+
+<pre id='PRE6' contenteditable='true' autocorrect='off' autocapitalize='off' spellcheck='false' >
+
+fn     create_node_type() -&gt; String                                                              
+       let o1 = option(&quot;ΜΟΝΗΣ ΕΠΙΛΟΓΗΣ&quot;) .value(&quot;Single&quot;) .selected() .n()          
+       let o2 = option(&quot;ΠΟΛΛΑΠΛΗΣ ΕΠΙΛΟΓΗΣ&quot;) .value(&quot;Multi&quot;) .n()               
+       let o3 = option(&quot;ΠΟΛΛΑΠΛΗΣ ΕΠΙΛΟΓΗΣ ΜΕ TICK&quot;) .value(&quot;MultiTick&quot;) .n() 
+       let o4 = option(&quot;TICK&quot;) .value(&quot;Bool&quot;) .n()                                               
+       let s = select(&amp;(o1 +&amp;o2 +&amp;o3 +&amp;o4)) .id(&quot;TYPE&quot;) . n()                                    
+       return s                                                                                  </pre></div></div>
+<div class='page' id='PAGE7' >
+
+<div >
+
+<pre id='PRE7' contenteditable='true' autocorrect='off' autocapitalize='off' spellcheck='false' >
+</pre></div></div></div>

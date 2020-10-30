@@ -1,0 +1,162 @@
+/* */
+	/*  */
+
+function suggest()
+	let line = IN.value
+	let cursor = IN .selectionStart
+	let n = line.length
+	line = line .slice(0 ,cursor)
+	let words = line .trim()  .replaceAll("\t" ," ")  .replaceAll("\n" ," ")  .replaceAll("," ," ")  .split(" ")  .filter((w)=> w != " ")
+	let ws = words .pop() .split("`")
+	if (ws .length == 1)
+		--->
+	let word = ws[0]
+	let x = "<ol>"
+	if ( word.length > 0 )
+		COMPLETIONS   .filter((c)=> c .includes(word))   .map((c)=> x += "<li>" +c +"</li>")
+	AC.innerHTML = x +"</ol>"
+
+function complete(  )
+	let line = IN.value
+	let cursor = IN .selectionStart
+	let before = line .slice(0 ,cursor)
+	let after = line .slice(cursor)
+	let chars = before .split("") .reverse()
+	let i1 = chars .indexOf(" ")
+	if ( i1 == -1 )
+		i1 = 1000
+	let i2 = chars .indexOf("\t")
+	if ( i2 == -1 )
+		i2 = 1000
+	let i3 = chars .indexOf("\n")
+	if ( i3 == -1 )
+		i3 = 1000
+	let i4 = chars .indexOf(",")
+	if ( i4 == -1 )
+		i4 = 1000
+	let i = Math .min(i1 ,i2)
+	i = Math .min(i ,i3)
+	i = Math .min(i ,i4)
+	let reversed = chars .join("")
+	let reversed_word = reversed .slice(0 ,i)
+	let rs = reversed_word .split("`")
+	if ( rs.length != 2 )
+		return false
+	let n = parseFloat(rs[0])
+	let completions = Array .from(AC .getElementsByTagName( "li" ))
+	if ( n > completions.length || n < 0)
+		return false
+	let completion = completions[n-1].innerText
+	before = before.slice(0 ,-reversed_word.length)
+	IN.value = before +completion +after
+	cursor = (before +completion).length
+	IN .setSelectionRange(cursor ,cursor)
+	return true
+
+function completions()
+	let e = ext()
+	switch (e)
+		case "cass": return COMPLETE_CSS
+		case "jass": return COMPLETE_JAVASCRIPT
+		case "rass": return COMPLETE_RUST
+		case "rass": return COMPLETE_TOML
+		default:  return COMPLETE_TXT
+
+var COMPLETE_CSS = []
+COMPLETE_CSS .push("@media all and (max-width: 900px)")
+COMPLETE_CSS .push("&#123;&#123; call .Import \"..css\" &#125;&#125;")
+COMPLETE_CSS .push("overflow-wrap: break-word")
+COMPLETE_CSS .push("word-break: break-all")
+COMPLETE_CSS .push("text-align: center")
+COMPLETE_CSS .push("text-align: right")
+COMPLETE_CSS .push("text-align: left")
+COMPLETE_CSS .push("padding:")
+COMPLETE_CSS .push("padding-left:")
+COMPLETE_CSS .push("padding-right:")
+COMPLETE_CSS .push("padding-top:")
+COMPLETE_CSS .push("padding-bottom:")
+COMPLETE_CSS .push("margin:")
+COMPLETE_CSS .push("margin-left:")
+COMPLETE_CSS .push("margin-right:")
+COMPLETE_CSS .push("margin-top:")
+COMPLETE_CSS .push("margin-bottom:")
+COMPLETE_CSS .push("background-color:")
+COMPLETE_CSS .push("color:")
+COMPLETE_CSS .push("position: relative")
+COMPLETE_CSS .push("position: absolute")
+COMPLETE_CSS .push("position: sticky")
+COMPLETE_CSS .push("position: fixed")
+COMPLETE_CSS .push("display: none")
+COMPLETE_CSS .push("display: flex")
+COMPLETE_CSS .push("flex-direction: column")
+COMPLETE_CSS .push("display: grid")
+COMPLETE_CSS .push("grid-template-columns: 1fr 1fr")
+COMPLETE_CSS .push("grid-gap: ")
+COMPLETE_CSS .push("display: none")
+COMPLETE_CSS .push("box-shadow: inset 0 0 2rem #")
+COMPLETE_CSS .push("border: 1px solid #")
+
+var COMPLETE_JAVASCRIPT = []
+COMPLETE_JAVASCRIPT .push("&#123;&#123; call .Import \"..js\" &#125;&#125;")
+COMPLETE_JAVASCRIPT .push("Array .from()")
+COMPLETE_JAVASCRIPT .push("parseFloat()")
+COMPLETE_JAVASCRIPT .push("(let x of xs)")
+COMPLETE_JAVASCRIPT .push("(var i=0 ;i&lt;n ;i++)")
+COMPLETE_JAVASCRIPT .push(".length")
+COMPLETE_JAVASCRIPT .push(".concat()")
+COMPLETE_JAVASCRIPT .push(".shift()")
+COMPLETE_JAVASCRIPT .push(".push()")
+COMPLETE_JAVASCRIPT .push(".split()")
+COMPLETE_JAVASCRIPT .push(".filter()")
+COMPLETE_JAVASCRIPT .push(".indexOf()")
+COMPLETE_JAVASCRIPT .push("window.onload = ")
+COMPLETE_JAVASCRIPT .push(".startsWith()")
+COMPLETE_JAVASCRIPT .push(".dataList")
+COMPLETE_JAVASCRIPT .push(".dataset")
+COMPLETE_JAVASCRIPT .push("document")
+COMPLETE_JAVASCRIPT .push("return")
+COMPLETE_JAVASCRIPT .push("pompt()")
+COMPLETE_JAVASCRIPT .push("alert()")
+COMPLETE_JAVASCRIPT .push("console.log()")
+COMPLETE_JAVASCRIPT .push("function")
+COMPLETE_JAVASCRIPT .push(".value")
+COMPLETE_JAVASCRIPT .push("JSON.stringify()")
+COMPLETE_JAVASCRIPT .push("JSON.parse()")
+COMPLETE_JAVASCRIPT .push(".parentElement")
+COMPLETE_JAVASCRIPT .push(".querySelector()")
+COMPLETE_JAVASCRIPT .push(".getElementsByTagName()")
+COMPLETE_JAVASCRIPT .push(".getElementsByClassName()")
+COMPLETE_JAVASCRIPT .push("addEventListener(\"\" ,)")
+COMPLETE_JAVASCRIPT .push("location.assign(\"\")")
+COMPLETE_JAVASCRIPT .push("location.replace(\"\")")
+COMPLETE_JAVASCRIPT .push("location.reload()")
+COMPLETE_JAVASCRIPT .push(".style.display")
+COMPLETE_JAVASCRIPT .push(".innerHTML")
+COMPLETE_JAVASCRIPT .push(".innerText")
+COMPLETE_JAVASCRIPT .push(".replaceWith()")
+COMPLETE_JAVASCRIPT .push(".remove()")
+COMPLETE_JAVASCRIPT .push(".classList.add()")
+COMPLETE_JAVASCRIPT .push(".classList.remove()")
+COMPLETE_JAVASCRIPT .push(".classList.replace()")
+COMPLETE_JAVASCRIPT .push(".classList.contains()")
+COMPLETE_JAVASCRIPT .push(".classList.forEach()")
+COMPLETE_JAVASCRIPT .push(".setAttribute()")
+COMPLETE_JAVASCRIPT .push(".removeAttribute()")
+
+var COMPLETE_RUST = []
+COMPLETE_RUST .push(".aql_str(&!!(\"FOR i IN _col_ FILTER i._key == '{}' RETURN i \" ,key)) .await ... ")
+COMPLETE_RUST .push("#[derive(Debug ,Clone ,Serialize ,Deserialize)]")
+COMPLETE_RUST .push("#[derive(Debug ,Serialize ,Deserialize)]")
+COMPLETE_RUST .push("#![allow(non_snake_case)]")
+COMPLETE_RUST .push("#![allow(dead_code)]")
+COMPLETE_RUST .push("#[allow(unused_imports)]")
+COMPLETE_RUST .push("#[get(\"/\")]")
+COMPLETE_RUST .push("#[post(\"/\")]")
+COMPLETE_RUST .push("return ")
+COMPLETE_RUST .push("println!(\"{}\" ,)")
+COMPLETE_RUST .push("println!(\"{:?}\" ,)")
+COMPLETE_RUST .push("println!(\"{:#?}\" ,)")
+var COMPLETE_TOML = []
+
+var COMPLETE_TXT = []
+

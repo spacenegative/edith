@@ -1,0 +1,124 @@
+/* import mobile */
+	 /*  */
+
+function showPage( currentPage ,newPage ,ROOT ,LOOP)
+	 var pages = Array.from( ROOT.getElementsByClassName( "page" ) )
+	 var pager = ROOT.getElementsByClassName( "pager" )[0]
+	 var n = pages.length
+	 if ( LOOP )
+		  if ( newPage == n )
+			   newPage = 0
+		  if ( newPage == -1 )
+			   newPage = n - 1
+	 else
+		  if ( newPage == n )
+			   newPage = n - 1
+		  if ( newPage == -1 )
+			   newPage = 0
+	 pager.innerText = (newPage+1) + "/" + n +"--" +FILE
+	 pages[currentPage].style.display = "none"
+	 pages[newPage].style.display = "flex"
+	 history.replaceState( null,null,"#"+newPage )
+
+function paged( ROOT ,LEFT ,RIGHT ,s ,LOOP ) /* e,e,e,bool,bool */
+	 //if s = true -> implement search
+	 //loop = true loop from last to first page
+	 //...paged
+
+	 //...paged
+	 function hi( term , text )
+		  term = lowerAndRemoveAccents( term )
+		  var l = term.length
+		  function dummy( text1,text2,text2formated,term )
+			   var n = text2formated.indexOf( term )
+			   if ( n == -1 )
+				    return text1 + text2
+			   else
+				    var found =      "<span class='hi'>"      +text2.substr( n,l )      +"</span>"
+				    text1 += text2.substr( 0,n ) + found
+				    text2 = text2.substr( n+l )
+				    text2formated = text2formated.substr( n+l )
+				    return dummy( text1,text2,text2formated,term )
+		  return dummy( "",text,lowerAndRemoveAccents( text ),term )
+
+	 //...paged
+	 function lowerAndRemoveAccents( text )
+		  text = text.toLocaleLowerCase(  )
+		  function replaceAll( x,y,text )
+			   var text1 = text.replace( x,y )
+			   if ( text1 == text )
+				    return text
+			   else
+				    return replaceAll( x,y,text1 )
+		  text = replaceAll( "ά","α",text )
+		  text = replaceAll( "έ","ε",text )
+		  text = replaceAll( "ή","η",text )
+		  text = replaceAll( "ί","ι",text )
+		  text = replaceAll( "ό","ο",text )
+		  text = replaceAll( "ύ","υ",text )
+		  text = replaceAll( "ώ","ω",text )
+		  text = replaceAll( "Ά","Α",text )
+		  text = replaceAll( "Έ","Ε",text )
+		  text = replaceAll( "Ή","Η",text )
+		  text = replaceAll( "Ί","Ι",text )
+		  text = replaceAll( "Ό","Ο",text )
+		  text = replaceAll( "Ύ","Υ",text )
+		  text = replaceAll( "Ώ","Ω",text )
+		  return text
+
+	 //...paged
+	 function search( e,ev )
+		  ev.preventDefault(  )
+		  var ROOT = e.parentElement.parentElement
+		  var pages = Array.from( ROOT.getElementsByClassName( "page" ) )
+		  var input = e.getElementsByTagName( "input" )[0].value
+		  var n = pages.length
+		  for ( var i=0 ; i<n ; i++ )
+			   pages[i].innerHTML = hi( input,pages[i].innerHTML )
+
+	 //...paged
+	 function getPage(  )
+		  var x = location.hash
+		  if ( x == "" )
+			   return 0
+		  else
+			   return parseInt( x.substr( 1 ) )
+
+	 //...paged
+	 function keyboardNextPage( ROOT,ev )
+		  if ( !ev.altKey && !ev.ctrlKey && ev.keyCode == 35 )
+			   var currentPage = getPage()
+			   showPage( currentPage , currentPage+1 , ROOT ,LOOP)
+	 function keyboardPrevPage( ROOT,ev )
+		  if ( !ev.altKey && !ev.ctrlKey && ev.keyCode == 36 )
+			   var currentPage = getPage()
+			   showPage( currentPage , currentPage-1 , ROOT ,LOOP)
+	 function mouseNext( ROOT,ev )
+		  var currentPage = getPage()
+		  showPage( currentPage , currentPage+1 ,ROOT ,LOOP)
+	 function mousePrev( ROOT,ev )
+		  var currentPage = getPage()
+		  showPage( currentPage ,currentPage-1 ,ROOT ,LOOP)
+	 function mobileNext( ROOT )
+		  var currentPage = getPage()
+		  showPage( currentPage ,currentPage+1 ,ROOT ,LOOP)
+	 function mobilePrev( ROOT )
+		  var currentPage = getPage()
+		  showPage( currentPage , currentPage-1 ,ROOT ,LOOP)
+
+	 //...paged
+	 function main( ROOT ,LEFT ,RIGHT ,s )
+		  var FORM = ROOT.getElementsByTagName( "form" )[0]
+		  if ( s )
+			   FORM .addEventListener( 'submit' , (ev)=> search( ROOT,ev ) )
+		  var currentPage = getPage(  )
+		  showPage( currentPage ,currentPage ,ROOT ,LOOP)
+		  if ( mobile() )
+			   addEventListener( 'swiped-left' , ( e )=>mobileNext( ROOT ) )
+			   addEventListener( 'swiped-right' , ( e )=>mobilePrev( ROOT ) )
+		  else
+			   COM.addEventListener('keydown' ,(ev)=>     keyboardNextPage(ROOT ,ev))
+			   COM.addEventListener('keydown' ,(ev)=>    keyboardPrevPage(ROOT ,ev))
+			   RIGHT .addEventListener('click' ,(ev)=>    mouseNext(ROOT ,ev))
+	 main( ROOT ,LEFT ,RIGHT ,s )
+

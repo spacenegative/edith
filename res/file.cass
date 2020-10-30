@@ -1,0 +1,161 @@
+:root
+	--tabs: 10
+	--B: #060606
+	--scale_x: .85
+	--scale_x_l_margin: -8%
+	--scale_x_r_margin: -8%
+	--fs: 22px
+	--fc: #fff
+*, *:after, *:before
+	margin: 0
+	padding: 0
+	-webkit-box-sizing: border-box
+	-moz-box-sizing: border-box
+	box-sizing: border-box
+{{ call .Import "_paged.css" }}
+@font-face
+	font-family: 'f'
+	src: url("/res/font/iosevka-slab-thin.ttf")
+	font-weight: 100
+@font-face
+	font-family: 'c'
+	//src: url("/res/font/Fraunces[SOFT,WONK,opsz,wght].ttf")
+	//src: url("/res/font/Manjari-Thin.otf")
+	src: url("/res/font/iosevka-slab-light.ttf")
+	font-weight: 100
+	//font-variation-settings: "SOFT" 1 ,"WONK" 1, "opsz" 40, "wght" 600
+*::selection
+	background-color: #fff
+	color: #333
+body
+	background-color: var( --B )
+	color: #ccc
+mark
+	background-color: #aaa
+.comment
+	tab-size: var( --tabs )
+	font-family: 'f'
+	color: #999
+	font-style: oblique
+	//font-size: 90%
+	//nst drl drlaeonst zxcoeans tzxcoenast zxco nsteazxc nstoeazxc nst oezaxcaenos 123456789drlts1t
+
+.page
+	nst
+	min-height: 100vh
+	width: 100%
+	display: flex
+	flex-direction: column
+	justify-content: space-around
+	padding-top: 5em
+	padding-bottom: 5em
+.page h1
+	color: #999
+	font-family: f
+	text-align: center
+	//margin: auto
+	font-size: 20px
+.page ul
+	line-height: 1.3em
+	font-family: f
+	font-size: var(--fs)
+	margin: auto
+	list-style: decimal
+	padding-left: 3em
+.page ul li
+	white-space: pre-wrap
+	tab-size: var( --tabs )
+	margin-bottom: .4em
+	margin-right: var(--scale_x_r_margin)
+	margin-left: var(--scale_x_l_margin)
+	transform: scale( var(--scale_x) ,1 )
+.page ul .sel
+	list-style-type: disc
+.page ul .cursor::before
+	//content: "\2648"
+	//content: "\2694"
+	//content: "\2716"
+	//content: "\2728"
+	//content: "\2758"
+	content: "\2768"
+	//content: "\2796"
+	//content: "\3007"
+	color: #eee
+	display: inline-block
+	width: 3.3em
+	margin-left: -3.3em
+
+#INc
+	position: fixed
+	backface-visibility: hidden
+	left: 0
+	bottom: 0
+	right: 0
+	z-index: -1
+	background-color: var(--B)
+#INc textarea
+	tab-size: 4
+	background-color: rgba( 0,0,0,0 )
+	font-family: f
+	font-size: 20px
+	color: var(--fc)
+	outline: none
+	border: none
+	width: 100%
+	margin: 1em
+	padding: 1em
+#INc textarea:focus
+	border-left: 1px solid #444y
+
+#COMc
+	position: fixed
+	backface-visibility: hidden
+	left: 0
+	right: 0
+	top: 0
+	z-index: 3
+#COM
+	padding: 1%
+	font-family: times new roman
+	font-size: 40px
+	color: var( --B )
+	text-shadow: 0 0 10px #fff
+	width: 100%
+	height: 100%
+	background-color: rgba( 0,0,0,0 )
+	border: none
+	outline: none
+
+#AC
+	position: fixed
+	backface-visibility: hidden
+	bottom: 6em
+	right: 0
+	z-index: 4
+	color: #aaa
+	padding: 1%
+	text-align: left
+#AC:focus
+	background-color: #fff
+#AC ol
+	margin-right: 0em
+	font-size: 20px
+
+#WALL
+	position: fixed
+	top: 0
+	right: 0
+	left: 0
+	bottom: 0
+	//display: flex
+	display: none
+#WALL img
+	width: 12%
+	margin: auto
+
+::-webkit-scrollbar
+	width: 0px
+::-webkit-scrollbar-track
+	background: var(--B)
+::-webkit-scrollbar-thumb
+
