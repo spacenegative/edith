@@ -1,4 +1,4 @@
-#Edith  
+# Edith  
 
 ## DISCLAIMER
 My main motive for creating the editor is minimal aesthetics, then ergonomics. 
