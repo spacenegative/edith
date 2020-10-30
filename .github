@@ -1,0 +1,6 @@
+#!/bin/bash
+if       [ "$1" == "init" ] ; then
+         git remote add origin https://github.com/spacenegative/edith.git
+else
+         git push -u origin master
+fi
