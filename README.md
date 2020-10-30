@@ -1,3 +1,4 @@
+<img src="res/img/dual_screen_screenshot.png" width="100%"></img>
 # Edith  
 
 ## DISCLAIMER
