@@ -1,5 +1,5 @@
 <img src="res/img/dual_screen_screenshot.png" width="100%"></img>
-# Edith  
+# edith  
 
 ## disclaimer
 the main motive for creating the editor is minimal aesthetics, then ergonomics. 
