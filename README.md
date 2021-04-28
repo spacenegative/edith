@@ -1,7 +1,7 @@
 <img src="res/img/dual_screen_screenshot.png" width="100%"></img>
 # Edith  
 
-## DISCLAIMER
+## disclaimer
 the main motive for creating the editor is minimal aesthetics, then ergonomics. 
 edith does pretty much everything unconventionally and it lacks in many ways. [we](https://onto.logy.at) use it everyday, but you probably should not.
 
