@@ -12,4 +12,4 @@ edith is a text/code editor that runs on the browser. inspired by the colorforth
 edith code is small and easilly extensible. syntax highlighting is custom and is defined via javascript functions. same with code completion. code completion (not a fan) is not smart but predifined. 
 
 ## installation 
-edith needs a web server running locally. she server is written in rust. instructions coming soon.
+edith needs a web server running locally. the server is written in rust. instructions coming soon.
